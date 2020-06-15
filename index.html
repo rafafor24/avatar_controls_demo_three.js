@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js avatar</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <script src="js/three.js"></script>
+    <script>
+        var scene = new THREE.Scene();
+        var planeSize = 300;
+        var playerSize = 5;
+        var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.y = 15;
+        camera.position.z = 25;
+
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        window.addEventListener('resize', function () {
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+
+        const loader = new THREE.CubeTextureLoader();
+        const texture = loader.load([
+            "images/space.jpg", "images/space.jpg", "images/space.jpg", "images/space.jpg", "images/space.jpg",
+            "images/space.jpg",
+        ]);
+        scene.background = texture;
+
+        var cube = new Player();
+        var plane = new Plane();
+        scene.add(cube);
+        scene.add(plane);
+
+        hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+        scene.add(hemiLight);
+
+        const initialDirLightPositionX = -100;
+        const initialDirLightPositionY = -100;
+        dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(initialDirLightPositionX, initialDirLightPositionY, 200);
+        dirLight.castShadow = true;
+        dirLight.target = cube;
+        scene.add(dirLight);
+
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        var d = 500;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+
+        backLight = new THREE.DirectionalLight(0x000000, .4);
+        backLight.position.set(200, 200, 50);
+        backLight.castShadow = true;
+        scene.add(backLight)
+
+        var xSpeed = 1;
+        var zSpeed = 1;
+        var acceleration = 0.03;
+        var maxSpeed = 3;
+
+        document.addEventListener("keydown", onDocumentKeyDown);
+        document.addEventListener("keyup", onDocumentKeyRelease);
+
+        function onDocumentKeyDown(event) {
+            var keyCode = event.which;
+            const perspective = -Math.PI / 6;
+
+            switch (keyCode) {
+                //ArrowLeft or A
+                case 37:
+                case 65:
+                    if (cube.position.x > -(planeSize / 2)) {
+                        cube.position.x -= xSpeed;
+                        camera.position.x -= xSpeed;
+                        cube.rotation.y = -Math.PI / 2 - perspective;
+                        if (xSpeed < maxSpeed)
+                            xSpeed += acceleration;
+                    }
+                    break;
+                    //ArrowUp or W
+                case 38:
+                case 87:
+                    if (cube.position.z > -(planeSize / 2)) {
+                        cube.position.z -= zSpeed;
+                        camera.position.z -= zSpeed;
+                        cube.rotation.y = -Math.PI;
+                        if (zSpeed < maxSpeed)
+                            zSpeed += acceleration;
+                    }
+                    break;
+                    //ArrowRight or D
+                case 39:
+                case 68:
+                    if (cube.position.x <= (planeSize / 2)) {
+                        cube.position.x += xSpeed;
+                        camera.position.x += xSpeed;
+                        cube.rotation.y = Math.PI / 2 + perspective;
+                        if (xSpeed < maxSpeed)
+                            xSpeed += acceleration;
+                    }
+                    break;
+                    //ArrowDown or S
+                case 40:
+                case 83:
+                    if (cube.position.z <= (planeSize / 2)) {
+                        cube.position.z += zSpeed;
+                        camera.position.z += zSpeed;
+                        cube.rotation.y = Math.PI * 2;
+                        if (zSpeed < maxSpeed)
+                            zSpeed += acceleration;
+                    }
+                    break;
+            }
+        };
+
+        function onDocumentKeyRelease(event) {
+            console.log("X: " + cube.position.x);
+            console.log("Speed X: " + xSpeed);
+            console.log("Z: " + cube.position.z);
+            console.log("Speed Z: " + zSpeed);
+            document.getElementById("stats").innerHTML = "X: " + cube.position.x.toFixed(2) + " // " + "Speed X: " + xSpeed.toFixed(2) +
+                " // " + "Z: " + cube.position.z.toFixed(2) + " // " + "Speed Z: " + zSpeed.toFixed(2);
+            xSpeed = 1;
+            zSpeed = 1;
+        }
+
+        //logic
+        var update = function () {
+
+        }
+        //draw
+        var render = function () {
+            renderer.render(scene, camera);
+            camera.lookAt(cube.position);
+        };
+        //loop
+        var GameLoop = function () {
+            requestAnimationFrame(GameLoop);
+            update();
+            render();
+        }
+
+        function Player() {
+            const player = new THREE.Group();
+
+            const materials = [
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/02.png'),
+                    side: THREE.DoubleSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/03.png'),
+                    side: THREE.DoubleSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/01.png'),
+                    side: THREE.DoubleSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/01.png'),
+                    side: THREE.DoubleSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/01.png'),
+                    side: THREE.DoubleSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load('images/04.jpg'),
+                    side: THREE.DoubleSide
+                }),
+            ];
+
+            const face = new THREE.Mesh(
+                new THREE.BoxBufferGeometry(playerSize, playerSize, playerSize),
+                new THREE.MeshFaceMaterial(materials)
+            );
+            face.position.y = 2;
+            face.castShadow = true;
+            face.receiveShadow = true;
+            player.add(face);
+
+            const baseHat = new THREE.Mesh(
+                new THREE.BoxBufferGeometry(6, 1, 6),
+                new THREE.MeshLambertMaterial({
+                    color: 0xD2691E,
+                    flatShading: true
+                })
+            );
+            baseHat.position.y = 5;
+            baseHat.castShadow = true;
+            baseHat.receiveShadow = false;
+            player.add(baseHat);
+
+            const topHat = new THREE.Mesh(
+                new THREE.BoxBufferGeometry(3, 1.5, 3),
+                new THREE.MeshLambertMaterial({
+                    color: 0xD2691E,
+                    flatShading: true
+                })
+            );
+            topHat.position.y = 6;
+            topHat.castShadow = true;
+            topHat.receiveShadow = false;
+
+            player.add(topHat);
+
+            return player;
+        }
+
+        function Plane() {
+
+            const build = new THREE.Group();
+
+            var geometryPlane = new THREE.BoxGeometry(planeSize + (playerSize * 2), 1, planeSize + (playerSize * 2));
+            var materialPlane = new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load('images/05.jpg'),
+                side: THREE.DoubleSide
+            });
+
+            const plane = new THREE.Mesh(geometryPlane, materialPlane);
+            plane.position.y = -1;
+            plane.castShadow = true;
+            plane.receiveShadow = true;
+
+            geometryWallZ = new THREE.BoxGeometry(planeSize + (playerSize * 2), playerSize / 2, playerSize / 2);
+            const wallZNeg = new THREE.Mesh(geometryWallZ, materialPlane);
+            wallZNeg.position.z = -(planeSize / 2) - playerSize;
+            const wallZPos = new THREE.Mesh(geometryWallZ, materialPlane);
+            wallZPos.position.z = (planeSize / 2) + playerSize;
+
+            geometryWallX = new THREE.BoxGeometry(playerSize / 2, playerSize / 2, planeSize + (playerSize * 2));
+            const wallXNeg = new THREE.Mesh(geometryWallX, materialPlane);
+            wallXNeg.position.x = -(planeSize / 2) - playerSize;
+            const wallXPos = new THREE.Mesh(geometryWallX, materialPlane);
+            wallXPos.position.x = (planeSize / 2) + playerSize;
+
+            build.add(plane);
+            build.add(wallZNeg);
+            build.add(wallZPos);
+            build.add(wallXNeg);
+            build.add(wallXPos);
+            return build;
+        }
+        GameLoop();
+    </script>
+    <div>
+        <h3 id="stats" style="text-align: center;">X: 0 // Speed X: 1 // Z: 0 // Speed Z: 1</h3>
+    </div>
+
+</body>
+
+</html>
