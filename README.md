@@ -4,7 +4,8 @@
 
 ## Live Demo
 ### https://rafafor24.github.io/avatar_controls_demo_three.js/
-
+## Video Explicativo
+### https://youtu.be/gecogYRL0ZM
 ## Despliegue Local
 ### Debido a las restricciones de seguridad [(Política del mismo origen)](https://en.wikipedia.org/wiki/Same-origin_policy) es necesario correr un servidor local si se desea visualizar el proyecto correctamente. 
 ## Opción 1
