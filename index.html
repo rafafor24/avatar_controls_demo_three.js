@@ -11,21 +11,21 @@
 <body>
     <script src="js/three.js"></script>
     <script>
-        var scene = new THREE.Scene();
-        var planeSize = 300;
-        var playerSize = 5;
-        var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let scene = new THREE.Scene();
+        let planeSize = 300;
+        let playerSize = 5;
+        let camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.y = 15;
         camera.position.z = 25;
 
-        var renderer = new THREE.WebGLRenderer();
+        let renderer = new THREE.WebGLRenderer();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         window.addEventListener('resize', function () {
-            var width = window.innerWidth;
-            var height = window.innerHeight;
+            let width = window.innerWidth;
+            let height = window.innerHeight;
             renderer.setSize(width, height);
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
@@ -38,8 +38,8 @@
         ]);
         scene.background = texture;
 
-        var cube = new Player();
-        var plane = new Plane();
+        let cube = new Player();
+        let plane = new Plane();
         scene.add(cube);
         scene.add(plane);
 
@@ -56,7 +56,7 @@
 
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
-        var d = 500;
+        let d = 500;
         dirLight.shadow.camera.left = -d;
         dirLight.shadow.camera.right = d;
         dirLight.shadow.camera.top = d;
@@ -67,10 +67,10 @@
         backLight.castShadow = true;
         scene.add(backLight)
 
-        var xSpeed = 1;
-        var zSpeed = 1;
-        var acceleration = 0.03;
-        var maxSpeed = 3;
+        let xSpeed = 1;
+        let zSpeed = 1;
+        let acceleration = 0.03;
+        let maxSpeed = 3;
         const perspective = -Math.PI / 6;
         let keysPressed = {};
 
@@ -78,53 +78,42 @@
         document.addEventListener("keyup", onDocumentKeyRelease);
 
         function onDocumentKeyDown(event) {
-            var keyCode = event.which;
+            let keyCode = event.which;
             keysPressed[keyCode] = true;
 
-
-
-            //ArrowLeft or A
-            if (keysPressed[37] || keysPressed[65]) {
-                if (cube.position.x > -(planeSize / 2)) {
-                    cube.position.x -= xSpeed;
-                    camera.position.x -= xSpeed;
-                    cube.rotation.y = -Math.PI / 2 - perspective;
-                    if (xSpeed < maxSpeed)
-                        xSpeed += acceleration;
-                }
+            //ArrowLeft or A && Limite del plano
+            if ((keysPressed[37] || keysPressed[65]) && (cube.position.x > -(planeSize / 2))) {
+                cube.position.x -= xSpeed;
+                camera.position.x -= xSpeed;
+                cube.rotation.y = -Math.PI / 2 - perspective;
+                if (xSpeed < maxSpeed)
+                    xSpeed += acceleration;
             }
 
-            //ArrowUp or W
-            if (keysPressed[38] || keysPressed[87]) {
-                if (cube.position.z > -(planeSize / 2)) {
-                    cube.position.z -= zSpeed;
-                    camera.position.z -= zSpeed;
-                    cube.rotation.y = -Math.PI;
-                    if (zSpeed < maxSpeed)
-                        zSpeed += acceleration;
-                }
+            //ArrowUp or W && Limite del plano
+            if ((keysPressed[38] || keysPressed[87]) && (cube.position.z > -(planeSize / 2))) {
+                cube.position.z -= zSpeed;
+                camera.position.z -= zSpeed;
+                cube.rotation.y = -Math.PI;
+                if (zSpeed < maxSpeed)
+                    zSpeed += acceleration;
             }
-            //ArrowRight or D
-            if (keysPressed[39] || keysPressed[68]) {
-                if (cube.position.x <= (planeSize / 2)) {
-                    cube.position.x += xSpeed;
-                    camera.position.x += xSpeed;
-                    cube.rotation.y = Math.PI / 2 + perspective;
-                    if (xSpeed < maxSpeed)
-                        xSpeed += acceleration;
-                }
+            //ArrowRight or D && Limite del plano
+            if ((keysPressed[39] || keysPressed[68]) && (cube.position.x <= (planeSize / 2))) {
+                cube.position.x += xSpeed;
+                camera.position.x += xSpeed;
+                cube.rotation.y = Math.PI / 2 + perspective;
+                if (xSpeed < maxSpeed)
+                    xSpeed += acceleration;
             }
-            //ArrowDown or S
-            if (keysPressed[40] || keysPressed[83]) {
-                if (cube.position.z <= (planeSize / 2)) {
-                    cube.position.z += zSpeed;
-                    camera.position.z += zSpeed;
-                    cube.rotation.y = Math.PI * 2;
-                    if (zSpeed < maxSpeed)
-                        zSpeed += acceleration;
-                }
+            //ArrowDown or S && Limite del plano
+            if ((keysPressed[40] || keysPressed[83]) && (cube.position.z <= (planeSize / 2))) {
+                cube.position.z += zSpeed;
+                camera.position.z += zSpeed;
+                cube.rotation.y = Math.PI * 2;
+                if (zSpeed < maxSpeed)
+                    zSpeed += acceleration;
             }
-
         };
 
         function onDocumentKeyRelease(event) {
@@ -137,16 +126,16 @@
         }
 
         //logic
-        var update = function () {
+        let update = function () {}
 
-        }
         //draw
-        var render = function () {
+        let render = function () {
             renderer.render(scene, camera);
             camera.lookAt(cube.position);
         };
+
         //loop
-        var GameLoop = function () {
+        let GameLoop = function () {
             requestAnimationFrame(GameLoop);
             update();
             render();
@@ -154,7 +143,10 @@
 
         function Player() {
             const player = new THREE.Group();
-
+            const materialBlanco = new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load('images/01.png'),
+                side: THREE.DoubleSide
+            });
             const materials = [
                 new THREE.MeshBasicMaterial({
                     map: new THREE.TextureLoader().load('images/02.png'),
@@ -164,27 +156,15 @@
                     map: new THREE.TextureLoader().load('images/03.png'),
                     side: THREE.DoubleSide
                 }),
-                new THREE.MeshBasicMaterial({
-                    map: new THREE.TextureLoader().load('images/01.png'),
-                    side: THREE.DoubleSide
-                }),
-                new THREE.MeshBasicMaterial({
-                    map: new THREE.TextureLoader().load('images/01.png'),
-                    side: THREE.DoubleSide
-                }),
-                new THREE.MeshBasicMaterial({
-                    map: new THREE.TextureLoader().load('images/01.png'),
-                    side: THREE.DoubleSide
-                }),
+                materialBlanco, materialBlanco, materialBlanco,
                 new THREE.MeshBasicMaterial({
                     map: new THREE.TextureLoader().load('images/04.jpg'),
                     side: THREE.DoubleSide
                 }),
             ];
-
             const face = new THREE.Mesh(
                 new THREE.BoxBufferGeometry(playerSize, playerSize, playerSize),
-                new THREE.MeshFaceMaterial(materials)
+                materials
             );
             face.position.y = 2;
             face.castShadow = true;
@@ -198,6 +178,7 @@
                     flatShading: true
                 })
             );
+
             baseHat.position.y = 5;
             baseHat.castShadow = true;
             baseHat.receiveShadow = false;
@@ -223,27 +204,29 @@
 
             const build = new THREE.Group();
 
-            var geometryPlane = new THREE.BoxGeometry(planeSize + (playerSize * 2), 1, planeSize + (playerSize * 2));
-            var materialPlane = new THREE.MeshBasicMaterial({
+            let geometryPlane = new THREE.BoxGeometry(planeSize + (playerSize * 2), 1, planeSize + (playerSize * 2));
+            let materialPlane = new THREE.MeshBasicMaterial({
                 map: new THREE.TextureLoader().load('images/grid.jpg'),
                 side: THREE.DoubleSide
             });
 
-            const plane = new THREE.Mesh(geometryPlane, materialPlane);
+            let plane = new THREE.Mesh(geometryPlane, materialPlane);
             plane.position.y = -1;
             plane.castShadow = true;
             plane.receiveShadow = true;
 
+            //Barreras arriba y abajo
             geometryWallZ = new THREE.BoxGeometry(planeSize + (playerSize * 2), playerSize / 2, playerSize / 2);
-            const wallZNeg = new THREE.Mesh(geometryWallZ, materialPlane);
+            let wallZNeg = new THREE.Mesh(geometryWallZ, materialPlane);
             wallZNeg.position.z = -(planeSize / 2) - playerSize;
-            const wallZPos = new THREE.Mesh(geometryWallZ, materialPlane);
+            let wallZPos = new THREE.Mesh(geometryWallZ, materialPlane);
             wallZPos.position.z = (planeSize / 2) + playerSize;
 
+            //Barreras izquierda y derecha
             geometryWallX = new THREE.BoxGeometry(playerSize / 2, playerSize / 2, planeSize + (playerSize * 2));
-            const wallXNeg = new THREE.Mesh(geometryWallX, materialPlane);
+            let wallXNeg = new THREE.Mesh(geometryWallX, materialPlane);
             wallXNeg.position.x = -(planeSize / 2) - playerSize;
-            const wallXPos = new THREE.Mesh(geometryWallX, materialPlane);
+            let wallXPos = new THREE.Mesh(geometryWallX, materialPlane);
             wallXPos.position.x = (planeSize / 2) + playerSize;
 
             build.add(plane);
@@ -253,6 +236,7 @@
             build.add(wallXPos);
             return build;
         }
+        //GameLoop
         GameLoop();
     </script>
     <div>
