@@ -71,68 +71,66 @@
         var zSpeed = 1;
         var acceleration = 0.03;
         var maxSpeed = 3;
+        const perspective = -Math.PI / 6;
+        let keysPressed = {};
 
         document.addEventListener("keydown", onDocumentKeyDown);
         document.addEventListener("keyup", onDocumentKeyRelease);
 
         function onDocumentKeyDown(event) {
             var keyCode = event.which;
-            const perspective = -Math.PI / 6;
+            keysPressed[keyCode] = true;
 
-            switch (keyCode) {
-                //ArrowLeft or A
-                case 37:
-                case 65:
-                    if (cube.position.x > -(planeSize / 2)) {
-                        cube.position.x -= xSpeed;
-                        camera.position.x -= xSpeed;
-                        cube.rotation.y = -Math.PI / 2 - perspective;
-                        if (xSpeed < maxSpeed)
-                            xSpeed += acceleration;
-                    }
-                    break;
-                    //ArrowUp or W
-                case 38:
-                case 87:
-                    if (cube.position.z > -(planeSize / 2)) {
-                        cube.position.z -= zSpeed;
-                        camera.position.z -= zSpeed;
-                        cube.rotation.y = -Math.PI;
-                        if (zSpeed < maxSpeed)
-                            zSpeed += acceleration;
-                    }
-                    break;
-                    //ArrowRight or D
-                case 39:
-                case 68:
-                    if (cube.position.x <= (planeSize / 2)) {
-                        cube.position.x += xSpeed;
-                        camera.position.x += xSpeed;
-                        cube.rotation.y = Math.PI / 2 + perspective;
-                        if (xSpeed < maxSpeed)
-                            xSpeed += acceleration;
-                    }
-                    break;
-                    //ArrowDown or S
-                case 40:
-                case 83:
-                    if (cube.position.z <= (planeSize / 2)) {
-                        cube.position.z += zSpeed;
-                        camera.position.z += zSpeed;
-                        cube.rotation.y = Math.PI * 2;
-                        if (zSpeed < maxSpeed)
-                            zSpeed += acceleration;
-                    }
-                    break;
+
+
+            //ArrowLeft or A
+            if (keysPressed[37] || keysPressed[65]) {
+                if (cube.position.x > -(planeSize / 2)) {
+                    cube.position.x -= xSpeed;
+                    camera.position.x -= xSpeed;
+                    cube.rotation.y = -Math.PI / 2 - perspective;
+                    if (xSpeed < maxSpeed)
+                        xSpeed += acceleration;
+                }
             }
+
+            //ArrowUp or W
+            if (keysPressed[38] || keysPressed[87]) {
+                if (cube.position.z > -(planeSize / 2)) {
+                    cube.position.z -= zSpeed;
+                    camera.position.z -= zSpeed;
+                    cube.rotation.y = -Math.PI;
+                    if (zSpeed < maxSpeed)
+                        zSpeed += acceleration;
+                }
+            }
+            //ArrowRight or D
+            if (keysPressed[39] || keysPressed[68]) {
+                if (cube.position.x <= (planeSize / 2)) {
+                    cube.position.x += xSpeed;
+                    camera.position.x += xSpeed;
+                    cube.rotation.y = Math.PI / 2 + perspective;
+                    if (xSpeed < maxSpeed)
+                        xSpeed += acceleration;
+                }
+            }
+            //ArrowDown or S
+            if (keysPressed[40] || keysPressed[83]) {
+                if (cube.position.z <= (planeSize / 2)) {
+                    cube.position.z += zSpeed;
+                    camera.position.z += zSpeed;
+                    cube.rotation.y = Math.PI * 2;
+                    if (zSpeed < maxSpeed)
+                        zSpeed += acceleration;
+                }
+            }
+
         };
 
         function onDocumentKeyRelease(event) {
-            console.log("X: " + cube.position.x);
-            console.log("Speed X: " + xSpeed);
-            console.log("Z: " + cube.position.z);
-            console.log("Speed Z: " + zSpeed);
-            document.getElementById("stats").innerHTML = "X: " + cube.position.x.toFixed(2) + " // " + "Speed X: " + xSpeed.toFixed(2) +
+            keysPressed[event.which] = false;
+            document.getElementById("stats").innerHTML = "X: " + cube.position.x.toFixed(2) + " // " + "Speed X: " +
+                xSpeed.toFixed(2) +
                 " // " + "Z: " + cube.position.z.toFixed(2) + " // " + "Speed Z: " + zSpeed.toFixed(2);
             xSpeed = 1;
             zSpeed = 1;
@@ -227,7 +225,7 @@
 
             var geometryPlane = new THREE.BoxGeometry(planeSize + (playerSize * 2), 1, planeSize + (playerSize * 2));
             var materialPlane = new THREE.MeshBasicMaterial({
-                map: new THREE.TextureLoader().load('images/05.jpg'),
+                map: new THREE.TextureLoader().load('images/grid.jpg'),
                 side: THREE.DoubleSide
             });
 
